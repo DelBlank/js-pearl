@@ -91,3 +91,31 @@ Function.prototype.bind = (context) => {
   }
 }
 ```
+
+## 柯里化连加
+
+`f(a)(b)(c).... = a + b + c + ...` 
+
+```js
+// 数组累加
+function add(arr = []){
+  return arr.reduce((acc, cur) => acc + cur)
+}
+
+// 柯里化累加
+function f(a) {
+  const args = [a]
+  
+  function ff (b) {
+    args.push(b);
+
+    return f(add(args))
+  }
+
+  ff.toString = function(){
+    return add(args)
+  }
+
+  return ff
+}
+```
