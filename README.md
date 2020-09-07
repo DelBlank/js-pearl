@@ -139,3 +139,84 @@ Object.prototype.toString.call(new Error()) ; // [object Error]
 Object.prototype.toString.call(document) ; // [object HTMLDocument]
 Object.prototype.toString.call(window) ; //[object global] window 是全局对象 global 的引用
 ```
+
+## `new` 原理
+
+```js
+new F()
+
+// 1. 创建空对象
+const obj = new Object()
+// 2. 空对象 __proto__ 指向 F.prototype
+obj.__proto__ = F.prototype
+// 3. 调用函数 
+const result = F.call(obj)
+// 4 返回结果
+return typeof result === 'object' ? result : obj
+```
+
+## `Object.create`
+
+```js
+function create(obj) {
+  function F();
+  F.prototype = obj
+
+  return new F()
+}
+```
+
+## 寄生组合继承
+
+```js
+function inherit(Child, Parent){
+  const p = Object.create(Parent)
+  
+  p.constructor = Child
+  Child.prototype = p
+}
+```
+
+### `debounce` `throttle`
+
+```js
+function debounce(fn, delay){
+  let timeId
+
+  return function(...args){
+    const self = this
+
+    timeId && clearTimeout(timeId)
+
+    timeId = setTimeout(() => {
+      fn.apply(self, args)
+      timeId = null
+    }, delay)
+  }
+}
+
+function throttle(fn, threshhold = 250) {
+  let last, timeId
+
+  return function(...args){
+    const self = this
+    const exec = () => {
+      fn.apply(self, args)
+      last = now
+      timeId = null
+    }
+    const now = +new Date()
+
+    timeId && clearTimeout(timeId)
+
+    // 开始或超时执行
+    if(!last || now - last >= threshhold) {
+      exec()
+      return
+    }
+    
+    // 时间片走完但是没有持续触发
+    timeId = setTimeout(() => {exec()}, last + threshhold - now)
+  }
+}
+```
