@@ -220,3 +220,28 @@ function throttle(fn, threshhold = 250) {
   }
 }
 ```
+
+## koa、redux middleware
+
+```js
+const middlewares = [
+  function(ctx, next){return next()},
+  function(ctx, next){return next()},
+  function(ctx, next){return next()},
+]
+
+// 组合
+function compose(middlewares){
+  return context => {
+    function dispatch(i=0){
+      return Promise.resolve().then(
+        () => middlewares[i](context, () => dispatch(i+1))
+      )
+    }
+
+    return dispatch(0)
+  }
+}
+
+compose(middlewares)(context)
+```
