@@ -159,7 +159,7 @@ return typeof result === 'object' ? result : obj
 
 ```js
 function create(obj) {
-  function F();
+  function F(){};
   F.prototype = obj
 
   return new F()
@@ -170,11 +170,16 @@ function create(obj) {
 
 ```js
 function inherit(Child, Parent){
-  const p = Object.create(Parent)
-  
-  p.constructor = Child
-  Child.prototype = p
+  // 继承父类原型属性
+  Child.prototype = Object.create(Parent.prototype, {constructor: Child})
 }
+
+function Child(){
+  // 继承父类实例属性
+  Parent.call(this)
+}
+
+inherit(Child, Parent)
 ```
 
 ### `debounce` `throttle`
