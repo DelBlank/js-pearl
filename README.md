@@ -281,3 +281,46 @@ function performFiber(fiber: FiberNode) {
   }
 }
 ```
+
+## react list diff 
+
+```js
+interface NodeMap {
+  [key: string]: {
+    key: string | number // 标识
+    mountIndex?: number // 老位置下标
+    nextIndex?: number// 新位置下标
+  }
+}
+
+function listDiff(prevMap: NodeMap, nextMap: NodeMap){
+  const patches = []
+
+  // 遍历找到需要删除的节点
+  Object.keys(prevMap).forEach(
+    (key) => {
+      if(!nextMap[key]) {
+        patches.push(['remove', prevMap[key], prevMap[key].mountIndex, null])
+      }
+    }
+  )
+
+  let lastIndex = 0
+  // 遍历找到需要新增或移动的点
+  Object.keys(nextMap).forEach(
+    key => {
+      const prevNode = prevMap[key]
+      const nextNode = nextMap[key]
+      if(!prevNode){
+        patches.push(['insert', nextNode, null, nextNode.nextIndex])
+      } else if(lastIndex > prevNode.mountIndex){
+        patches.push(['move', prevNode, prevNode.mountIndex, nextNode.nextIndex])
+      }
+
+      lastIndex = prevNode ? Math.max(prevNode.mountIndex, lastIndex) : lastIndex
+    }
+  )
+
+  return patches
+}
+```
