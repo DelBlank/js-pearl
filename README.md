@@ -250,3 +250,34 @@ function compose(middlewares){
 
 compose(middlewares)(context)
 ```
+
+## fiber 链表和遍历
+
+```js
+interface FiberNode {
+  return: FiberNode | null // 父节点
+  child: FiberNode | null // 第一个子节点
+  sibling: FiberNode | null // 下一个兄弟节点
+}
+
+// 深度遍历
+function performFiber(fiber: FiberNode) {
+  let current = fiber
+  while(true) {
+    current = current.child
+
+    if(current) {
+      continue
+    }
+
+    while(!current.sibling){
+      if(current === root) {
+        return 
+      }
+      current = current.return
+    }
+
+    current = current.sibling
+  }
+}
+```
